@@ -1,0 +1,5 @@
+Placeholder image: A friendly, simple robot face or a book icon with a speech bubble.
+This file would typically be a small PNG image (e.g., 64x64 pixels).
+For the purpose of this exercise, this text file represents that image.
+The `data-ai-hint` on `next/image` components using this would guide an AI to find a suitable replacement.
+Keywords for Unsplash: robot mascot, chatbot icon, friendly bot

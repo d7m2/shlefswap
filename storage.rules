@@ -1,0 +1,104 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // DEVELOPMENT ONLY RULES - REMOVED
+    // match /{allPaths=**} {
+    //   allow read: if true;
+    //   allow write: if request.auth != null;
+    // }
+    
+    // PRODUCTION RULES BELOW:
+    // Helpers
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidImage() {
+      return request.resource.contentType.matches('image/.*') 
+          && request.resource.contentType != 'image/svg+xml';
+    }
+    
+    function isValidImageSize(maxSizeMB) {
+      return request.resource.size <= maxSizeMB * 1024 * 1024;
+    }
+
+    // Default rule - Deny read/write access by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+
+    // Book listing images folder
+    match /bookListings/{userId}/{fileName} {
+      // Allow public read access to all book listing images
+      allow read: if true;
+      
+      // Allow users to upload, update, or delete their own book images
+      // Enforce size and type restrictions
+      allow create: if isOwner(userId)
+                    && isValidImage()
+                    && isValidImageSize(5)  // Max 5MB
+                    && (fileName.matches('.*\\.(jpg|jpeg|png|webp)$'));
+                    
+      allow update: if isOwner(userId)
+                    && isValidImage()
+                    && isValidImageSize(5);
+                    
+      allow delete: if isOwner(userId);
+    }
+
+    // Profile pictures folder
+    match /profilePictures/{userId}/{fileName} {
+      // Allow public read access to profile pictures
+      allow read: if true; 
+      
+      // Allow users to upload, update, or delete their own profile pictures
+      allow create: if isOwner(userId)
+                    && isValidImage()
+                    && isValidImageSize(2)  // Max 2MB
+                    && (fileName.matches('.*\\.(jpg|jpeg|png|webp)$'));
+                    
+      allow update: if isOwner(userId)
+                    && isValidImage()
+                    && isValidImageSize(2);
+                    
+      allow delete: if isOwner(userId);
+    }
+    
+    // Message attachments folder
+    match /messageAttachments/{conversationId}/{messageId}/{fileName} {
+      // Allow attachment viewing only by conversation participants
+      // This requires a Firestore read to check if user is a participant
+      allow read: if isAuthenticated() && exists(/databases/$(database)/documents/conversations/$(conversationId)/participants/$(request.auth.uid));
+      
+      // Allow uploads only by conversation participants
+      allow create: if isAuthenticated() 
+                    && exists(/databases/$(database)/documents/conversations/$(conversationId)/participants/$(request.auth.uid))
+                    && isValidImageSize(3)  // Max 3MB
+                    && (
+                        // Allow images
+                        (isValidImage() && fileName.matches('.*\\.(jpg|jpeg|png|webp)$'))
+                        // Or allow PDFs
+                        || (request.resource.contentType == 'application/pdf' && fileName.matches('.*\\.pdf$'))
+                      );
+                      
+      // Attachments cannot be modified after upload
+      allow update: if false;
+      
+      // Allow deletion only by the message sender
+      allow delete: if isAuthenticated() 
+                    && exists(/databases/$(database)/documents/conversations/$(conversationId)/messages/$(messageId))
+                    && get(/databases/$(database)/documents/conversations/$(conversationId)/messages/$(messageId)).data.senderId == request.auth.uid;
+    }
+    
+    // Public resources that anyone can read
+    match /public/{fileName=**} {
+      allow read: if true;
+      allow write: if false; // Only admins can upload to public folder (use admin tools)
+    }
+  }
+}

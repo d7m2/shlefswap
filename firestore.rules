@@ -1,0 +1,261 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ========================================
+    // DEVELOPMENT MODE - REMOVE BEFORE PRODUCTION
+    // ========================================
+    // To use these rules, comment out everything below this section
+    // and uncomment this section.
+    
+    // Completely open rules for development purposes only
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    // ========================================
+    // PRODUCTION RULES BELOW - Comment these out if using dev mode
+    // ========================================
+
+    // Helper function to check if a user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if the user is the owner of a document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if a field update is allowed
+    function isAllowedUpdate(allowedFields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(allowedFields);
+    }
+    
+    // Helper function to check if certain fields remain unchanged
+    function fieldsUnchanged(unchangeableFields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(unchangeableFields);
+    }
+    
+    // Helper function to validate basic book listing fields
+    function isValidBookListing() {
+      return request.resource.data.title is string && 
+             request.resource.data.title.size() > 0 &&
+             request.resource.data.author is string &&
+             request.resource.data.author.size() > 0 &&
+             request.resource.data.description is string;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if true; // Public profiles can be read by anyone
+      
+      // A user can create their own profile document
+      allow create: if isAuthenticated() && 
+                    request.resource.data.id == request.auth.uid &&
+                    request.resource.data.username is string &&
+                    request.resource.data.email is string;
+      
+      // A user can update their own profile, but certain fields are protected
+      allow update: if isOwner(userId) &&
+                    fieldsUnchanged(['id', 'email', 'memberSince', 'p2pRating', 'p2pTransactionCount']);
+
+      allow delete: if isOwner(userId); // User can delete their own profile
+
+      // User's subcollections
+      match /myListings/{listingId} {
+        allow read: if true; // Listings under a user profile are public
+        allow create: if isOwner(userId) &&
+                      request.resource.data.listingId == listingId &&
+                      isValidBookListing();
+        allow update: if isOwner(userId);
+        allow delete: if isOwner(userId);
+      }
+
+      match /orders/{orderId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isOwner(userId) && 
+                      fieldsUnchanged(['id', 'userId', 'date', 'orderNumber']) &&
+                      request.resource.data.status in ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Completed'];
+        allow delete: if false; // Orders should never be deleted, only cancelled
+      }
+
+      match /savedSearches/{searchId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+      }
+    }
+
+    // Used Book Listings collection
+    match /usedBookListings/{listingId} {
+      allow read: if true; // Everyone can read listings
+      
+      // Creation rules
+      allow create: if isAuthenticated() && 
+                   request.resource.data.seller.id == request.auth.uid &&
+                   isValidBookListing() &&
+                   request.resource.data.listingType in ['Sale', 'Swap'] &&
+                   (request.resource.data.listingType == 'Sale' ? 
+                     request.resource.data.salePrice is number && request.resource.data.salePrice > 0 
+                     : 
+                     request.resource.data.swapPreferences is string);
+      
+      // Update rules
+      allow update: if isAuthenticated() && 
+                   resource.data.seller.id == request.auth.uid &&
+                   fieldsUnchanged(['listingId', 'seller', 'listedDate']) &&
+                   request.resource.data.listingType in ['Sale', 'Swap']; 
+      
+      // Delete rules - only the seller can delete their listing
+      allow delete: if isAuthenticated() && resource.data.seller.id == request.auth.uid;
+    }
+
+    // Reviews collection
+    match /reviews/{reviewId} {
+      allow read: if true; // Everyone can read reviews
+      
+      // Creation rules - authenticated users can create reviews
+      allow create: if isAuthenticated() && 
+                   request.resource.data.userId == request.auth.uid &&
+                   request.resource.data.username is string &&
+                   request.resource.data.rating is number &&
+                   request.resource.data.rating >= 1 &&
+                   request.resource.data.rating <= 5 &&
+                   request.resource.data.comment is string;
+      
+      // Update rules - only the author can update their review
+      allow update: if isAuthenticated() && 
+                   resource.data.userId == request.auth.uid &&
+                   fieldsUnchanged(['userId', 'bookId', 'reviewDate', 'username']) &&
+                   request.resource.data.rating is number &&
+                   request.resource.data.rating >= 1 &&
+                   request.resource.data.rating <= 5;
+      
+      // Delete rules - only the author can delete their review
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // P2P Transactions
+    match /offers/{offerId} {
+      allow read: if true; // Everyone can read offers
+      
+      // Creation rules - users can create offers on listings
+      allow create: if isAuthenticated() && 
+                   request.resource.data.offeredByUserId == request.auth.uid &&
+                   request.resource.data.status == 'Pending';
+      
+      // Update rules - only the seller or offerer can update the offer
+      allow update: if isAuthenticated() && 
+                   (resource.data.sellerUserId == request.auth.uid || resource.data.offeredByUserId == request.auth.uid) &&
+                   fieldsUnchanged(['listingId', 'offeredByUserId', 'sellerUserId', 'dateOffered']);
+      
+      // Delete rules - offers should not be deleted, only cancelled or rejected
+      allow delete: if false;
+    }
+
+    // Conversations collection
+    match /conversations/{conversationId} {
+      // Read rules - only participants can read their conversations
+      allow read: if isAuthenticated() && 
+                 request.auth.uid in resource.data.participantIds;
+      
+      // Creation rules - authenticated users can start conversations
+      allow create: if isAuthenticated() && 
+                   request.auth.uid in request.resource.data.participantIds;
+      
+      // Update rules - only participants can update conversation metadata
+      allow update: if isAuthenticated() && 
+                   request.auth.uid in resource.data.participantIds &&
+                   fieldsUnchanged(['participantIds']);
+      
+      // Messages subcollection
+      match /messages/{messageId} {
+        // Read rules - only participants can read messages
+        allow read: if isAuthenticated() && 
+                   request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantIds;
+        
+        // Creation rules - only participants can send messages
+        allow create: if isAuthenticated() && 
+                     request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participantIds &&
+                     request.resource.data.senderId == request.auth.uid;
+        
+        // Messages cannot be edited or deleted once sent
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+
+    // Notifications collection
+    match /notifications/{notificationId} {
+      // Read rules - only the recipient can read their notifications
+      allow read: if isAuthenticated() && 
+                 resource.data.userId == request.auth.uid;
+      
+      // Creation rules - Admin functions or backend triggers create notifications
+      allow create: if false; // Only through server functions
+      
+      // Update rules - users can only mark notifications as read
+      allow update: if isAuthenticated() && 
+                   resource.data.userId == request.auth.uid &&
+                   isAllowedUpdate(['isRead']);
+      
+      // Delete rules - users can delete their own notifications
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // User Favorites collection
+    match /userFavorites/{favoriteId} {
+      // Read rules - only the user can see their favorites
+      allow read: if isAuthenticated() && 
+                 resource.data.userId == request.auth.uid;
+      
+      // Creation rules - users can add to favorites
+      allow create: if isAuthenticated() && 
+                   request.resource.data.userId == request.auth.uid;
+      
+      // Update rules - updates not needed, just delete and create
+      allow update: if false;
+      
+      // Delete rules - users can remove their favorites
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Orders collection
+    match /orders/{orderId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Add other rules (create, update, delete) as needed, for example:
+      // allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      // allow update: if isAuthenticated() && resource.data.userId == request.auth.uid && fieldsUnchanged(['id', 'userId', 'date', 'orderNumber']);
+      // allow delete: if false; // Or based on specific logic
+    }
+
+    // User General Ratings collection
+    match /userGeneralRatings/{ratingId} {
+      allow read: if true; // General ratings are public
+      
+      // Creation: Authenticated user can rate another user (not themselves)
+      // The document ID should be raterUserId_ratedUserId
+      allow create: if isAuthenticated() && 
+                     request.resource.data.raterUserId == request.auth.uid &&
+                     request.resource.data.raterUserId != request.resource.data.ratedUserId &&
+                     ratingId == request.resource.data.raterUserId + '_' + request.resource.data.ratedUserId &&
+                     request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+      
+      // Update: Only the original rater can update their rating
+      // and certain fields cannot be changed.
+      allow update: if isAuthenticated() && 
+                     resource.data.raterUserId == request.auth.uid &&
+                     fieldsUnchanged(['raterUserId', 'ratedUserId', 'createdAt']) &&
+                     request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+                     
+      // Delete: Only the original rater can delete their rating
+      allow delete: if isAuthenticated() && resource.data.raterUserId == request.auth.uid;
+    }
+
+    // Prevent access to other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

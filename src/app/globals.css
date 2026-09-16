@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 210 40% 98%; /* Lighter, cooler background */
+    --foreground: 222 47% 11%; /* Dark blue-gray for text */
+
+    --card: 0 0% 100%; /* Pure white for cards for crispness */
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 205 65% 45%; /* A more vibrant, slightly deeper blue */
+    --primary-foreground: 0 0% 100%; 
+
+    --secondary: 30 80% 90%; /* Soft Peach for secondary elements */
+    --secondary-foreground: 25 55% 30%; /* Darker text on peach */
+
+    --muted: 210 40% 90%; /* Lighter gray for muted elements */
+    --muted-foreground: 215 28% 45%; /* Softer muted text */
+
+    --accent: 350 75% 60%; /* A slightly more vibrant Coral/Terracotta */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 210 30% 87%; /* Softer border color */
+    --input: 210 30% 94%; /* Input background */
+    --ring: 205 65% 50%; /* Primary color for focus rings */
+    --ring-accent: 350 75% 65%;
+
+
+    --radius: 0.65rem; /* Slightly increased radius for softer corners */
+
+    --chart-1: 205 65% 45%;
+    --chart-2: 350 75% 60%;
+    --chart-3: 30 80% 70%; /* Lighter peach for charts */
+    --chart-4: 150 50% 60%; /* A soft green */
+    --chart-5: 260 60% 65%; /* A soft purple */
+
+    /* Specific adjustments for ShelfWise */
+    --sidebar-background: 210 40% 96%; 
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 205 65% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 350 75% 60%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 210 30% 87%;
+    --sidebar-ring: 205 65% 50%;
+  }
+
+  .dark {
+    --background: 222 47% 11%; /* Dark blue-gray */
+    --foreground: 210 40% 98%; /* Light text */
+
+    --card: 222 47% 15%; /* Slightly lighter dark for cards */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 15%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 205 60% 55%; /* Brighter blue for dark mode */
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 30 50% 25%; /* Darker Peach */
+    --secondary-foreground: 30 80% 90%; 
+
+    --muted: 222 47% 20%; 
+    --muted-foreground: 210 40% 70%; 
+
+    --accent: 350 70% 65%; /* Brighter Coral/Terracotta */
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%; /* Darker red */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 222 47% 25%;
+    --input: 222 47% 22%;
+    --ring: 205 60% 55%;
+    --ring-accent: 350 70% 65%; 
+
+
+    --chart-1: 205 60% 55%;
+    --chart-2: 350 70% 65%;
+    --chart-3: 30 60% 50%;
+    --chart-4: 150 40% 50%;
+    --chart-5: 260 50% 55%;
+    
+    --sidebar-background: 222 47% 13%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 205 60% 55%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 350 70% 65%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 222 47% 25%;
+    --sidebar-ring: 205 60% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground text-sm sm:text-base; /* Responsive base font size */
+    font-feature-settings: "rlig" 1, "calt" 1; /* Enable ligatures and contextual alternates for Geist font */
+  }
+
+  h1 { @apply text-3xl font-bold sm:text-4xl md:text-5xl; }
+  h2 { @apply text-2xl font-bold sm:text-3xl md:text-4xl; }
+  h3 { @apply text-xl font-semibold sm:text-2xl md:text-3xl; }
+  h4 { @apply text-lg font-semibold sm:text-xl md:text-2xl; }
+  h5 { @apply text-base font-semibold sm:text-lg; } /* Corrected text-md to text-base */
+  h6 { @apply text-sm font-semibold sm:text-base; } /* Corrected text-md to text-base */
+  p  { @apply leading-relaxed; }
+
+
+  /* RTL specific styles */
+  html[dir="rtl"] body {
+    text-align: right;
+  }
+
+  html[dir="rtl"] .ml-1 { margin-right: 0.25rem !important; margin-left: 0px !important; }
+  html[dir="rtl"] .mr-1 { margin-left: 0.25rem !important; margin-right: 0px !important; }
+  html[dir="rtl"] .ml-2 { margin-right: 0.5rem !important; margin-left: 0px !important; }
+  html[dir="rtl"] .mr-2 { margin-left: 0.5rem !important; margin-right: 0px !important; }
+  html[dir="rtl"] .pl-8 { padding-right: 2rem !important; padding-left: 0px !important; }
+  html[dir="rtl"] .pr-2 { padding-left: 0.5rem !important; padding-right: 0px !important; }
+  html[dir="rtl"] .pl-10 { padding-right: 2.5rem !important; padding-left: 0px !important; }
+  html[dir="rtl"] .pr-32 { padding-left: 8rem !important; padding-right: 0px !important; }
+  html[dir="rtl"] .pl-14 { padding-right: 3.5rem !important; padding-left: 0px !important; }
+  html[dir="rtl"] .pl-12 { padding-right: 3rem !important; padding-left: 0px !important; }
+  
+  html[dir="rtl"] .left-3 { right: 0.75rem !important; left: auto !important; }
+  html[dir="rtl"] .right-3 { left: 0.75rem !important; right: auto !important; }
+  html[dir="rtl"] .left-4 { right: 1rem !important; left: auto !important; }
+  html[dir="rtl"] .left-5 { right: 1.25rem !important; left: auto !important; }
+  html[dir="rtl"] .right-2 { left: 0.5rem !important; right: auto !important; }
+  html[dir="rtl"] .right-2\.5 { left: 0.625rem !important; right: auto !important; }
+  html[dir="rtl"] .left-1\/2 { right: 50% !important; left: auto !important; }
+  
+  html[dir="rtl"] .text-left { text-align: right !important; }
+  html[dir="rtl"] .text-right { text-align: left !important; }
+  html[dir="rtl"] .sm\:text-left { @media (min-width: 640px) { text-align: right !important; } }
+  html[dir="rtl"] .md\:text-left { @media (min-width: 768px) { text-align: right !important; } }
+  
+
+  html[dir="rtl"] .space-x-1 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+  html[dir="rtl"] .space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+  html[dir="rtl"] .space-x-3 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+  html[dir="rtl"] .space-x-4 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+  html[dir="rtl"] .md\:space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+  html[dir="rtl"] .sm\:space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+  html[dir="rtl"] .lg\:space-x-2 > :not([hidden]) ~ :not([hidden]) { --tw-space-x-reverse: 1 !important; }
+
+}
+
+@layer components {
+  .section-title {
+    @apply text-2xl font-bold tracking-tight text-primary mb-1 sm:text-3xl sm:mb-2;
+  }
+  .section-subtitle {
+    @apply text-base text-muted-foreground mb-4 sm:text-lg sm:mb-6;
+  }
+
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, hsl(var(--border)/0.3) 1px, transparent 1px),
+                      linear-gradient(to bottom, hsl(var(--border)/0.3) 1px, transparent 1px);
+    background-size: 20px 20px; /* Adjust size of grid squares */
+  }
+  .dark .bg-grid-pattern {
+     background-image: linear-gradient(to right, hsl(var(--border)/0.15) 1px, transparent 1px),
+                      linear-gradient(to bottom, hsl(var(--border)/0.15) 1px, transparent 1px);
+  }
+}

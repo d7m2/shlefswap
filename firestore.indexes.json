@@ -1,0 +1,190 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "listedDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "listingType", "order": "ASCENDING" },
+        { "fieldPath": "listedDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "listingType", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "listingType", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "condition", "order": "ASCENDING" },
+        { "fieldPath": "listedDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "condition", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "condition", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "sellerId", "order": "ASCENDING" },
+        { "fieldPath": "listedDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "sellerId", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "usedBookListings",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "sellerId", "order": "ASCENDING" },
+        { "fieldPath": "salePrice", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "books",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "genres", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "books",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "genres", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "averageRating", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "books",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "genres", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "title", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "books",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "title", "order": "ASCENDING" },
+        { "fieldPath": "author", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reviews",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "bookId", "order": "ASCENDING" },
+        { "fieldPath": "reviewDate", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "offers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "listingId", "order": "ASCENDING" },
+        { "fieldPath": "dateOffered", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "p2pFeedback",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "reviewedUserId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "conversations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participantIds", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "lastActivity", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "userFavorites",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "addedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+} 
